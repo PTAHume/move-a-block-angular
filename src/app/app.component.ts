@@ -37,6 +37,8 @@ export class AppComponent implements OnInit {
     this.currentArrangement[37] = new Cell({ content: obstacle, index: 37 });
     this.currentArrangement[27] = new Cell({ content: goal, index: 27 });
     this.currentArrangement[17] = new Cell({ content: box, index: 17 });
+    this.currentArrangement[57] = new Cell({ content: obstacle, index: 57 });
+    this.currentArrangement[47] = new Cell({ content: box, index: 47 });
   };
   ngOnInit() {
     this.GameSetUp();
@@ -83,7 +85,11 @@ export class AppComponent implements OnInit {
             }
           );
           boxesNewLocations.forEach((cell: Cell) => {
-            if (cell !== undefined && cell.content !== obstacle) {
+            if (
+              cell !== undefined &&
+              cell.content !== obstacle &&
+              cell.content !== box
+            ) {
               this.currentArrangement[cell.index].content = box;
               this.currentArrangement[cell.index + width].content = emptySpace;
             }
@@ -96,9 +102,7 @@ export class AppComponent implements OnInit {
                 : emptySpace;
           }
         }
-      }
-
-      if (moveDown === event.key) {
+      } else if (moveDown === event.key) {
         const playersNewLocation: Cell =
           this.currentArrangement[playerLocation + width];
         if (
@@ -110,8 +114,12 @@ export class AppComponent implements OnInit {
               return this.currentArrangement[cell.index + width];
             }
           );
-          boxesNewLocations.forEach((cell: Cell) => {
-            if (cell !== undefined && cell.content !== obstacle) {
+          boxesNewLocations.reverse().forEach((cell: Cell) => {
+            if (
+              cell !== undefined &&
+              cell.content !== obstacle &&
+              cell.content !== box
+            ) {
               this.currentArrangement[cell.index].content = box;
               this.currentArrangement[cell.index - width].content = emptySpace;
             }
@@ -124,9 +132,7 @@ export class AppComponent implements OnInit {
                 : emptySpace;
           }
         }
-      }
-
-      if (moveLeft === event.key) {
+      } else if (moveLeft === event.key) {
         const playersNewLocation: Cell =
           this.currentArrangement[playerLocation - 1];
         if (
@@ -143,7 +149,8 @@ export class AppComponent implements OnInit {
             if (
               cell !== undefined &&
               cell.content !== obstacle &&
-              rightBoundary.includes(cell.index) === false
+              rightBoundary.includes(cell.index) === false &&
+              cell.content !== box
             ) {
               this.currentArrangement[cell.index].content = box;
               this.currentArrangement[cell.index + 1].content = emptySpace;
@@ -157,9 +164,7 @@ export class AppComponent implements OnInit {
                 : emptySpace;
           }
         }
-      }
-
-      if (moveRight === event.key) {
+      } else if (moveRight === event.key) {
         const playersNewLocation: Cell =
           this.currentArrangement[playerLocation + 1];
         if (
@@ -172,11 +177,12 @@ export class AppComponent implements OnInit {
               return this.currentArrangement[cell.index + 1];
             }
           );
-          boxesNewLocations.forEach((cell: Cell) => {
+          boxesNewLocations.reverse().forEach((cell: Cell) => {
             if (
               cell !== undefined &&
               cell.content !== obstacle &&
-              leftBoundary.includes(cell.index) === false
+              leftBoundary.includes(cell.index) === false &&
+              cell.content !== box
             ) {
               this.currentArrangement[cell.index].content = box;
               this.currentArrangement[cell.index - 1].content = emptySpace;
