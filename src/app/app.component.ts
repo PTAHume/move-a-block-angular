@@ -26,6 +26,7 @@ const moveRight: string = 'ArrowRight';
 export class AppComponent implements OnInit {
   keyDown = false;
   currentArrangement: Array<Cell> = Array<Cell>();
+  goalLocations: Array<Cell> = Array<Cell>();
   GameSetUp = () => {
     this.currentArrangement = [...Array(64)].map(
       (cell: Cell, index: number) => {
@@ -39,9 +40,13 @@ export class AppComponent implements OnInit {
     this.currentArrangement[17] = new Cell({ content: box, index: 17 });
     this.currentArrangement[57] = new Cell({ content: obstacle, index: 57 });
     this.currentArrangement[47] = new Cell({ content: box, index: 47 });
+    this.currentArrangement[52] = new Cell({ content: goal, index: 52 });
   };
   ngOnInit() {
     this.GameSetUp();
+    this.goalLocations = this.currentArrangement.filter(
+      (cell: Cell) => cell.content === goal
+    );
   }
   handleKeyUpEvent(event: KeyboardEvent) {
     if (
@@ -196,6 +201,30 @@ export class AppComponent implements OnInit {
                 : emptySpace;
           }
         }
+      }
+
+      this.goalLocations.forEach(
+        (x: Cell) =>
+          (this.currentArrangement[x.index].content =
+            this.currentArrangement[x.index].content === emptySpace
+              ? goal
+              : this.currentArrangement[x.index].content)
+      );
+
+      if (
+        this.currentArrangement
+          .filter((cell: Cell) => cell.content === box)
+          .every((cell: Cell) => {
+            return !(
+              this.goalLocations.findIndex(
+                (value: Cell) => value.index === cell.index
+              ) === -1
+            );
+          })
+      ) {
+        setTimeout(() => {
+          alert('you win !');
+        }, 1);
       }
     }
   }
