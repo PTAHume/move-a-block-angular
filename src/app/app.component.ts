@@ -1,18 +1,30 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import Cell from './shared/Cell';
+import ICell from './interfaces/ICell';
+import HandleUpPressAction from './shared/HandleUpPressAction';
+import HandleDownPressAction from './shared/HandleDownPressAction';
+import HandleLeftPressAction from './shared/HandleLeftPressAction';
+import HandleRightPressAction from './shared/HandleRightPressAction';
+import LevelCompleteCheck from './shared/LevelCompleteCheck';
+import ResetGoals from './shared/ResetGoals';
 
 const width: number = 8;
-const leftBoundary: number[] = [0, 8, 16, 24, 32, 40, 48, 56];
-const rightBoundary: number[] = [7, 15, 23, 31, 39, 47, 55, 63];
+
 const emptySpace = '/assets/images/blank.png';
 const player = '/assets/images/player.png';
 const box = '/assets/images/box.png';
 const goal = '/assets//images/goal.png';
 const obstacle = '/assets/images/obstacle.png';
+
 const moveUp: string = 'ArrowUp';
 const moveDown: string = 'ArrowDown';
 const moveLeft: string = 'ArrowLeft';
 const moveRight: string = 'ArrowRight';
+
+const { handleUpAction } = new HandleUpPressAction();
+const { handleDownAction } = new HandleDownPressAction();
+const { handleLeftAction } = new HandleLeftPressAction();
+const { handleRightAction } = new HandleRightPressAction();
 
 @Component({
   selector: 'app-root',
@@ -25,11 +37,12 @@ const moveRight: string = 'ArrowRight';
 })
 export class AppComponent implements OnInit {
   keyDown = false;
-  currentArrangement: Array<Cell> = Array<Cell>();
-  goalLocations: Array<Cell> = Array<Cell>();
+  currentArrangement: Array<ICell> = Array<ICell>();
+  goalLocations: Array<ICell> = Array<ICell>();
+
   GameSetUp = () => {
     this.currentArrangement = [...Array(64)].map(
-      (cell: Cell, index: number) => {
+      (cell: ICell, index: number) => {
         return new Cell({ content: emptySpace, index: index });
       }
     );
@@ -42,12 +55,14 @@ export class AppComponent implements OnInit {
     this.currentArrangement[47] = new Cell({ content: box, index: 47 });
     this.currentArrangement[52] = new Cell({ content: goal, index: 52 });
   };
+
   ngOnInit() {
     this.GameSetUp();
     this.goalLocations = this.currentArrangement.filter(
-      (cell: Cell) => cell.content === goal
+      (cell: ICell) => cell.content === goal
     );
   }
+
   handleKeyUpEvent(event: KeyboardEvent) {
     if (
       this.keyDown == true &&
@@ -70,162 +85,40 @@ export class AppComponent implements OnInit {
     ) {
       this.keyDown = true;
       event.preventDefault();
-      const boxLocations: Cell[] = this.currentArrangement.filter(
-        (cell: Cell) => cell.content === box
-      );
-      const playerLocation: number = this.currentArrangement.findIndex(
-        (value: Cell) => value.content === player
-      );
 
-      if (moveUp === event.key) {
-        const playersNewLocation: Cell =
-          this.currentArrangement[playerLocation - width];
-        if (
-          playersNewLocation !== undefined &&
-          playersNewLocation.content !== obstacle
-        ) {
-          const boxesNewLocations: Cell[] = boxLocations.map<Cell>(
-            (cell: Cell) => {
-              return this.currentArrangement[cell.index - width];
-            }
-          );
-          boxesNewLocations.forEach((cell: Cell) => {
-            if (
-              cell !== undefined &&
-              cell.content !== obstacle &&
-              cell.content !== box
-            ) {
-              this.currentArrangement[cell.index].content = box;
-              this.currentArrangement[cell.index + width].content = emptySpace;
-            }
-          });
-          if (this.currentArrangement[playerLocation - width].content !== box) {
-            this.currentArrangement[playerLocation - width].content = player;
-            this.currentArrangement[playerLocation].content =
-              this.currentArrangement[playerLocation].content === box
-                ? box
-                : emptySpace;
-          }
-        }
-      } else if (moveDown === event.key) {
-        const playersNewLocation: Cell =
-          this.currentArrangement[playerLocation + width];
-        if (
-          playersNewLocation !== undefined &&
-          playersNewLocation.content !== obstacle
-        ) {
-          const boxesNewLocations: Cell[] = boxLocations.map<Cell>(
-            (cell: Cell) => {
-              return this.currentArrangement[cell.index + width];
-            }
-          );
-          boxesNewLocations.reverse().forEach((cell: Cell) => {
-            if (
-              cell !== undefined &&
-              cell.content !== obstacle &&
-              cell.content !== box
-            ) {
-              this.currentArrangement[cell.index].content = box;
-              this.currentArrangement[cell.index - width].content = emptySpace;
-            }
-          });
-          if (this.currentArrangement[playerLocation + width].content !== box) {
-            this.currentArrangement[playerLocation + width].content = player;
-            this.currentArrangement[playerLocation].content =
-              this.currentArrangement[playerLocation].content === box
-                ? box
-                : emptySpace;
-          }
-        }
-      } else if (moveLeft === event.key) {
-        const playersNewLocation: Cell =
-          this.currentArrangement[playerLocation - 1];
-        if (
-          playersNewLocation !== undefined &&
-          playersNewLocation.content !== obstacle &&
-          rightBoundary.includes(playerLocation - 1) === false
-        ) {
-          const boxesNewLocations: Cell[] = boxLocations.map<Cell>(
-            (cell: Cell) => {
-              return this.currentArrangement[cell.index - 1];
-            }
-          );
-          boxesNewLocations.forEach((cell: Cell) => {
-            if (
-              cell !== undefined &&
-              cell.content !== obstacle &&
-              rightBoundary.includes(cell.index) === false &&
-              cell.content !== box
-            ) {
-              this.currentArrangement[cell.index].content = box;
-              this.currentArrangement[cell.index + 1].content = emptySpace;
-            }
-          });
-          if (this.currentArrangement[playerLocation - 1].content !== box) {
-            this.currentArrangement[playerLocation - 1].content = player;
-            this.currentArrangement[playerLocation].content =
-              this.currentArrangement[playerLocation].content === box
-                ? box
-                : emptySpace;
-          }
-        }
-      } else if (moveRight === event.key) {
-        const playersNewLocation: Cell =
-          this.currentArrangement[playerLocation + 1];
-        if (
-          playersNewLocation !== undefined &&
-          playersNewLocation.content !== obstacle &&
-          leftBoundary.includes(playerLocation + 1) === false
-        ) {
-          const boxesNewLocations: Cell[] = boxLocations.map<Cell>(
-            (cell: Cell) => {
-              return this.currentArrangement[cell.index + 1];
-            }
-          );
-          boxesNewLocations.reverse().forEach((cell: Cell) => {
-            if (
-              cell !== undefined &&
-              cell.content !== obstacle &&
-              leftBoundary.includes(cell.index) === false &&
-              cell.content !== box
-            ) {
-              this.currentArrangement[cell.index].content = box;
-              this.currentArrangement[cell.index - 1].content = emptySpace;
-            }
-          });
-          if (this.currentArrangement[playerLocation + 1].content !== box) {
-            this.currentArrangement[playerLocation + 1].content = player;
-            this.currentArrangement[playerLocation].content =
-              this.currentArrangement[playerLocation].content === box
-                ? box
-                : emptySpace;
-          }
-        }
-      }
+      this.checkKeyEvent(event);
 
-      this.goalLocations.forEach(
-        (x: Cell) =>
-          (this.currentArrangement[x.index].content =
-            this.currentArrangement[x.index].content === emptySpace
-              ? goal
-              : this.currentArrangement[x.index].content)
+      ResetGoals(this.currentArrangement, this.goalLocations);
+
+      LevelCompleteCheck(this.currentArrangement, this.goalLocations);
+    }
+  }
+
+  private checkKeyEvent(event: KeyboardEvent) {
+    const boxLocations: ICell[] = this.currentArrangement.filter(
+      (cell: ICell) => cell.content === box
+    );
+    const playerLocation: number = this.currentArrangement.findIndex(
+      (value: ICell) => value.content === player
+    );
+    if (moveUp === event.key) {
+      handleUpAction(
+        playerLocation,
+        boxLocations,
+        this.currentArrangement,
+        width
       );
-
-      if (
-        this.currentArrangement
-          .filter((cell: Cell) => cell.content === box)
-          .every((cell: Cell) => {
-            return !(
-              this.goalLocations.findIndex(
-                (value: Cell) => value.index === cell.index
-              ) === -1
-            );
-          })
-      ) {
-        setTimeout(() => {
-          alert('you win !');
-        }, 1);
-      }
+    } else if (moveDown === event.key) {
+      handleDownAction(
+        playerLocation,
+        boxLocations,
+        this.currentArrangement,
+        width
+      );
+    } else if (moveLeft === event.key) {
+      handleLeftAction(playerLocation, boxLocations, this.currentArrangement);
+    } else if (moveRight === event.key) {
+      handleRightAction(playerLocation, boxLocations, this.currentArrangement);
     }
   }
 }
