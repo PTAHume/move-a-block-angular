@@ -8,13 +8,13 @@ import HandleRightPressAction from './shared/HandleRightPressAction';
 import LevelCompleteCheck from './shared/LevelCompleteCheck';
 import ResetGoals from './shared/ResetGoals';
 
-const width: number = 8;
+const width: number = 10;
 
 const emptySpace = '/assets/images/blank.png';
 const player = '/assets/images/player.png';
 const box = '/assets/images/box.png';
 const goal = '/assets//images/goal.png';
-const obstacle = '/assets/images/obstacle.png';
+const invalid = '/assets/images/invalid.png';
 
 const moveUp: string = 'ArrowUp';
 const moveDown: string = 'ArrowDown';
@@ -40,20 +40,58 @@ export class AppComponent implements OnInit {
   currentArrangement: Array<ICell> = Array<ICell>();
   goalLocations: Array<ICell> = Array<ICell>();
 
+  data = [
+    {
+      content: '/assets/images/player.png',
+      index: 10,
+    },
+    {
+      content: '/assets/images/box.png',
+      index: 17,
+    },
+    {
+      content: '/assets//images/goal.png',
+      index: 27,
+    },
+    {
+      content: '/assets/images/obstacle.png',
+      index: 35,
+    },
+    {
+      content: '/assets/images/box.png',
+      index: 47,
+    },
+    {
+      content: '/assets//images/goal.png',
+      index: 52,
+    },
+    {
+      content: '/assets/images/obstacle.png',
+      index: 55,
+    },
+  ];
+
   GameSetUp = () => {
-    this.currentArrangement = [...Array(64)].map(
+    this.currentArrangement = [...Array(100)].map(
       (cell: ICell, index: number) => {
         return new Cell({ content: emptySpace, index: index });
       }
     );
 
-    this.currentArrangement[10] = new Cell({ content: player, index: 10 });
-    this.currentArrangement[37] = new Cell({ content: obstacle, index: 37 });
-    this.currentArrangement[27] = new Cell({ content: goal, index: 27 });
-    this.currentArrangement[17] = new Cell({ content: box, index: 17 });
-    this.currentArrangement[57] = new Cell({ content: obstacle, index: 57 });
-    this.currentArrangement[47] = new Cell({ content: box, index: 47 });
-    this.currentArrangement[52] = new Cell({ content: goal, index: 52 });
+    let response = <ICell[]>JSON.parse(JSON.stringify(this.data));
+    response.forEach((cell) => {
+      this.currentArrangement[cell.index] = new Cell({
+        content: cell.content,
+        index: cell.index,
+      });
+    });
+    // this.currentArrangement[10] = new Cell({ content: player, index: 10 });
+    // this.currentArrangement[37] = new Cell({ content: obstacle, index: 37 });
+    // this.currentArrangement[27] = new Cell({ content: goal, index: 27 });
+    // this.currentArrangement[17] = new Cell({ content: box, index: 17 });
+    // this.currentArrangement[57] = new Cell({ content: obstacle, index: 57 });
+    // this.currentArrangement[47] = new Cell({ content: box, index: 47 });
+    // this.currentArrangement[52] = new Cell({ content: goal, index: 52 });
   };
 
   ngOnInit() {
@@ -71,8 +109,13 @@ export class AppComponent implements OnInit {
         moveLeft === event.key ||
         moveRight === event.key)
     ) {
-      this.keyDown = false;
       event.preventDefault();
+      this.currentArrangement
+        .filter((cell: ICell) => cell.content === invalid)
+        .forEach((cell: ICell) => {
+          this.currentArrangement[cell.index].content = player;
+        });
+      this.keyDown = false;
     }
   }
   handleKeyDownEvent(event: KeyboardEvent) {
@@ -83,8 +126,8 @@ export class AppComponent implements OnInit {
         moveLeft === event.key ||
         moveRight === event.key)
     ) {
-      this.keyDown = true;
       event.preventDefault();
+      this.keyDown = true;
 
       this.checkKeyEvent(event);
 

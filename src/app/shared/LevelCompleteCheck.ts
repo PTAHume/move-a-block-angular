@@ -17,7 +17,7 @@ const LevelCompleteCheck = (
   ) {
     setTimeout(() => {
       alert('you win !');
-    }, 1);
+    }, 10);
   }
 };
 export default LevelCompleteCheck;

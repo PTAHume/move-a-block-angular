@@ -4,6 +4,7 @@ const emptySpace = '/assets/images/blank.png';
 const player = '/assets/images/player.png';
 const box = '/assets/images/box.png';
 const obstacle = '/assets/images/obstacle.png';
+const invalid = '/assets/images/invalid.png';
 
 export default class HandleUpPressAction implements IHandleUpPressAction {
   constructor() {}
@@ -26,6 +27,8 @@ export default class HandleUpPressAction implements IHandleUpPressAction {
         currentArrangement,
         width
       );
+    } else {
+      currentArrangement[playerLocation].content = invalid;
     }
   };
 
@@ -40,6 +43,7 @@ export default class HandleUpPressAction implements IHandleUpPressAction {
         return currentArrangement[cell.index - width];
       }
     );
+    const reverseBadMove: number[] = [];
     boxesNewLocations.forEach((cell: ICell) => {
       if (
         cell !== undefined &&
@@ -48,12 +52,20 @@ export default class HandleUpPressAction implements IHandleUpPressAction {
       ) {
         currentArrangement[cell.index].content = box;
         currentArrangement[cell.index + width].content = emptySpace;
+        reverseBadMove.push(cell.index);
       }
     });
     if (currentArrangement[playerLocation - width].content !== box) {
       currentArrangement[playerLocation - width].content = player;
       currentArrangement[playerLocation].content =
         currentArrangement[playerLocation].content === box ? box : emptySpace;
+    } else if (currentArrangement[playerLocation - width].content == box) {
+      currentArrangement[playerLocation].content = invalid;
+      reverseBadMove.forEach((index: number) => {
+        currentArrangement[index].content =
+          currentArrangement[index].content === invalid ? invalid : emptySpace;
+        currentArrangement[index + width].content = box;
+      });
     }
   };
 }

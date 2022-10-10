@@ -4,7 +4,8 @@ const emptySpace = '/assets/images/blank.png';
 const player = '/assets/images/player.png';
 const box = '/assets/images/box.png';
 const obstacle = '/assets/images/obstacle.png';
-const leftBoundary: number[] = [0, 8, 16, 24, 32, 40, 48, 56];
+const invalid = '/assets/images/invalid.png';
+const leftBoundary: number[] = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90];
 
 export default class HandleRightPressAction implements IHandleRightPressAction {
   constructor() {}
@@ -25,6 +26,8 @@ export default class HandleRightPressAction implements IHandleRightPressAction {
         currentArrangement,
         playerLocation
       );
+    } else {
+      currentArrangement[playerLocation].content = invalid;
     }
   };
 
@@ -38,6 +41,7 @@ export default class HandleRightPressAction implements IHandleRightPressAction {
         return currentArrangement[cell.index + 1];
       }
     );
+    const reverseBadMove: number[] = [];
     boxesNewLocations.reverse().forEach((cell: ICell) => {
       if (
         cell !== undefined &&
@@ -47,12 +51,20 @@ export default class HandleRightPressAction implements IHandleRightPressAction {
       ) {
         currentArrangement[cell.index].content = box;
         currentArrangement[cell.index - 1].content = emptySpace;
+        reverseBadMove.push(cell.index);
       }
     });
     if (currentArrangement[playerLocation + 1].content !== box) {
       currentArrangement[playerLocation + 1].content = player;
       currentArrangement[playerLocation].content =
         currentArrangement[playerLocation].content === box ? box : emptySpace;
+    } else if (currentArrangement[playerLocation + 1].content == box) {
+      currentArrangement[playerLocation].content = invalid;
+      reverseBadMove.forEach((index: number) => {
+        currentArrangement[index].content =
+          currentArrangement[index].content === invalid ? invalid : emptySpace;
+        currentArrangement[index - 1].content = box;
+      });
     }
   };
 }
