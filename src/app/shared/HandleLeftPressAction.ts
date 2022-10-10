@@ -36,6 +36,14 @@ export default class HandleLeftPressAction implements IHandleLeftPressAction {
     currentArrangement: ICell[],
     playerLocation: number
   ) => {
+    const reverseBadMove: number[] = this.moveBoxes(
+      boxLocations,
+      currentArrangement
+    );
+    this.movePlayer(currentArrangement, playerLocation, reverseBadMove);
+  };
+
+  private moveBoxes(boxLocations: ICell[], currentArrangement: ICell[]) {
     const boxesNewLocations: ICell[] = boxLocations.map<ICell>(
       (cell: ICell) => {
         return currentArrangement[cell.index - 1];
@@ -54,6 +62,14 @@ export default class HandleLeftPressAction implements IHandleLeftPressAction {
         reverseBadMove.push(cell.index);
       }
     });
+    return reverseBadMove;
+  }
+
+  private movePlayer(
+    currentArrangement: ICell[],
+    playerLocation: number,
+    reverseBadMove: number[]
+  ) {
     if (currentArrangement[playerLocation - 1].content !== box) {
       currentArrangement[playerLocation - 1].content = player;
       currentArrangement[playerLocation].content =
@@ -66,5 +82,5 @@ export default class HandleLeftPressAction implements IHandleLeftPressAction {
         currentArrangement[index + 1].content = box;
       });
     }
-  };
+  }
 }

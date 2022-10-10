@@ -38,6 +38,19 @@ export default class HandleDownPressAction implements IHandleDownPressAction {
     width: number,
     playerLocation: number
   ) => {
+    const reverseBadMove: number[] = this.moveBoxes(
+      boxLocations,
+      currentArrangement,
+      width
+    );
+    this.movePlayer(currentArrangement, playerLocation, width, reverseBadMove);
+  };
+
+  private moveBoxes(
+    boxLocations: ICell[],
+    currentArrangement: ICell[],
+    width: number
+  ) {
     const boxesNewLocations: ICell[] = boxLocations.map<ICell>(
       (cell: ICell) => {
         return currentArrangement[cell.index + width];
@@ -55,6 +68,15 @@ export default class HandleDownPressAction implements IHandleDownPressAction {
         reverseBadMove.push(cell.index);
       }
     });
+    return reverseBadMove;
+  }
+
+  private movePlayer(
+    currentArrangement: ICell[],
+    playerLocation: number,
+    width: number,
+    reverseBadMove: number[]
+  ) {
     if (currentArrangement[playerLocation + width].content !== box) {
       currentArrangement[playerLocation + width].content = player;
       currentArrangement[playerLocation].content =
@@ -67,5 +89,5 @@ export default class HandleDownPressAction implements IHandleDownPressAction {
         currentArrangement[index - width].content = box;
       });
     }
-  };
+  }
 }
