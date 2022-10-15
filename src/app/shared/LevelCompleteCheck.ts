@@ -2,7 +2,9 @@ import ICell from '../interfaces/ICell';
 const box = '/assets/images/box.png';
 const LevelCompleteCheck = (
   currentArrangement: Array<ICell>,
-  goalLocations: Array<ICell>
+  goalLocations: Array<ICell>,
+  level: number,
+  GameSetUp: Function
 ) => {
   if (
     currentArrangement
@@ -17,6 +19,8 @@ const LevelCompleteCheck = (
   ) {
     setTimeout(() => {
       alert('you win !');
+      level = level + 1;
+      GameSetUp(level);
     }, 10);
   }
 };

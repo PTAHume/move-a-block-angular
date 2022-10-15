@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, HostListener } from '@angular/core';
+import { LevelService } from './services/level.service';
 import Cell from './shared/Cell';
 import ICell from './interfaces/ICell';
 import HandleUpPressAction from './shared/HandleUpPressAction';
@@ -13,8 +14,9 @@ const width: number = 10;
 const emptySpace = '/assets/images/blank.png';
 const player = '/assets/images/player.png';
 const box = '/assets/images/box.png';
-const goal = '/assets//images/goal.png';
+const goal = '/assets/images/goal.png';
 const invalid = '/assets/images/invalid.png';
+const obstacle = '/assets/images/obstacle.png';
 
 const moveUp: string = 'ArrowUp';
 const moveDown: string = 'ArrowDown';
@@ -27,81 +29,48 @@ const { handleLeftAction } = new HandleLeftPressAction();
 const { handleRightAction } = new HandleRightPressAction();
 
 @Component({
-  selector: 'app-root',
+  selector: 'game-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  host: {
-    '(document:keydown)': 'handleKeyDownEvent($event)',
-    '(document:keyup)': 'handleKeyUpEvent($event)',
-  },
 })
 export class AppComponent implements OnInit {
   keyDown = false;
   currentArrangement: Array<ICell> = Array<ICell>();
   goalLocations: Array<ICell> = Array<ICell>();
+  level: number = 0;
+  constructor(private levelService: LevelService) {}
 
-  data = [
-    {
-      content: '/assets/images/player.png',
-      index: 10,
-    },
-    {
-      content: '/assets/images/box.png',
-      index: 17,
-    },
-    {
-      content: '/assets//images/goal.png',
-      index: 27,
-    },
-    {
-      content: '/assets/images/obstacle.png',
-      index: 35,
-    },
-    {
-      content: '/assets/images/box.png',
-      index: 47,
-    },
-    {
-      content: '/assets//images/goal.png',
-      index: 52,
-    },
-    {
-      content: '/assets/images/obstacle.png',
-      index: 55,
-    },
-  ];
-
-  GameSetUp = () => {
+  GameSetUp = (level: number = 0) => {
     this.currentArrangement = [...Array(100)].map(
       (cell: ICell, index: number) => {
         return new Cell({ content: emptySpace, index: index });
       }
     );
-
-    let response = <ICell[]>JSON.parse(JSON.stringify(this.data));
-    response.forEach((cell) => {
-      this.currentArrangement[cell.index] = new Cell({
-        content: cell.content,
-        index: cell.index,
+    this.level = level;
+    this.levelService
+      .LoadLevel(this.level)
+      .subscribe((response: ICell[]) => {
+        response.forEach(
+          (result: ICell) =>
+            (this.currentArrangement[result.index] = new Cell({
+              content: result.content,
+              index: result.index,
+            }))
+        );
+      })
+      .add(() => {
+        this.goalLocations = this.currentArrangement.filter(
+          (cell: ICell) => cell.content === goal
+        );
       });
-    });
-    // this.currentArrangement[10] = new Cell({ content: player, index: 10 });
-    // this.currentArrangement[37] = new Cell({ content: obstacle, index: 37 });
-    // this.currentArrangement[27] = new Cell({ content: goal, index: 27 });
-    // this.currentArrangement[17] = new Cell({ content: box, index: 17 });
-    // this.currentArrangement[57] = new Cell({ content: obstacle, index: 57 });
-    // this.currentArrangement[47] = new Cell({ content: box, index: 47 });
-    // this.currentArrangement[52] = new Cell({ content: goal, index: 52 });
   };
 
   ngOnInit() {
     this.GameSetUp();
-    this.goalLocations = this.currentArrangement.filter(
-      (cell: ICell) => cell.content === goal
-    );
   }
-
-  handleKeyUpEvent(event: KeyboardEvent) {
+  @HostListener('window:keyup', ['$event']) handleKeyUpEvent(
+    event: KeyboardEvent
+  ) {
     if (
       this.keyDown == true &&
       (moveUp === event.key ||
@@ -118,7 +87,9 @@ export class AppComponent implements OnInit {
       this.keyDown = false;
     }
   }
-  handleKeyDownEvent(event: KeyboardEvent) {
+  @HostListener('window:keydown', ['$event']) handleKeyDownEvent(
+    event: KeyboardEvent
+  ) {
     if (
       this.keyDown == false &&
       (moveUp === event.key ||
@@ -133,7 +104,12 @@ export class AppComponent implements OnInit {
 
       ResetGoals(this.currentArrangement, this.goalLocations);
 
-      LevelCompleteCheck(this.currentArrangement, this.goalLocations);
+      LevelCompleteCheck(
+        this.currentArrangement,
+        this.goalLocations,
+        this.level,
+        this.GameSetUp
+      );
     }
   }
 
