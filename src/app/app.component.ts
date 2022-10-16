@@ -8,6 +8,7 @@ import HandleLeftPressAction from './shared/HandleLeftPressAction';
 import HandleRightPressAction from './shared/HandleRightPressAction';
 import LevelCompleteCheck from './shared/LevelCompleteCheck';
 import ResetGoals from './shared/ResetGoals';
+import { CdTimerModule } from 'angular-cd-timer';
 
 const width: number = 10;
 
@@ -38,6 +39,7 @@ export class AppComponent implements OnInit {
   currentArrangement: Array<ICell> = Array<ICell>();
   goalLocations: Array<ICell> = Array<ICell>();
   level: number = 0;
+
   constructor(private levelService: LevelService) {}
 
   GameSetUp = (level: number = 0) => {
