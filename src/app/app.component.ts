@@ -52,7 +52,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.sub) {
-      this.sub.unsubscribe;
+      this.sub.unsubscribe();
     }
   }
 
