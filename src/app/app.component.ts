@@ -14,7 +14,7 @@ import HandleRightPressAction from './shared/HandleRightPressAction';
 import LevelCompleteCheck from './shared/LevelCompleteCheck';
 import ResetGoals from './shared/ResetGoals';
 import { CdTimerModule } from 'angular-cd-timer';
-import { Subscribable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 const width: number = 10;
 
