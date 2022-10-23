@@ -4,8 +4,9 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'https://localhost:44359/api/game',
-  clientId: '',
+  apiUrl: 'https://localhost:7274/game',
+  clientId:
+    '303407860813-eo9dh1olj09vlbv87636qjtuv7h2c0h9.apps.googleusercontent.com',
 };
 
 /*

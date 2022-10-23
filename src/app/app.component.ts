@@ -1,4 +1,10 @@
-import { Component, OnInit, EventEmitter, HostListener } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  EventEmitter,
+  HostListener,
+  OnDestroy,
+} from '@angular/core';
 import { LevelService } from './services/level.service';
 import Cell from './shared/Cell';
 import ICell from './interfaces/ICell';
@@ -9,6 +15,7 @@ import HandleRightPressAction from './shared/HandleRightPressAction';
 import LevelCompleteCheck from './shared/LevelCompleteCheck';
 import ResetGoals from './shared/ResetGoals';
 import { CdTimerModule } from 'angular-cd-timer';
+import { Subscribable, Subscription } from 'rxjs';
 
 const width: number = 10;
 
@@ -34,13 +41,24 @@ const { handleRightAction } = new HandleRightPressAction();
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   keyDown = false;
   currentArrangement: Array<ICell> = Array<ICell>();
   goalLocations: Array<ICell> = Array<ICell>();
   level: number = 0;
+  sub!: Subscription;
 
   constructor(private levelService: LevelService) {}
+
+  ngOnDestroy(): void {
+    if (this.sub) {
+      this.sub.unsubscribe;
+    }
+  }
+
+  ngOnInit() {
+    this.GameSetUp();
+  }
 
   GameSetUp = (level: number = 0) => {
     this.currentArrangement = [...Array(100)].map(
@@ -49,9 +67,8 @@ export class AppComponent implements OnInit {
       }
     );
     this.level = level;
-    this.levelService
-      .LoadLevel(this.level)
-      .subscribe((response: ICell[]) => {
+    this.sub = this.levelService.LoadLevel(this.level).subscribe(
+      (response: ICell[]) => {
         response.forEach(
           (result: ICell) =>
             (this.currentArrangement[result.index] = new Cell({
@@ -59,17 +76,16 @@ export class AppComponent implements OnInit {
               index: result.index,
             }))
         );
-      })
-      .add(() => {
+      },
+      null,
+      () => {
         this.goalLocations = this.currentArrangement.filter(
           (cell: ICell) => cell.content === goal
         );
-      });
+      }
+    );
   };
 
-  ngOnInit() {
-    this.GameSetUp();
-  }
   @HostListener('window:keyup', ['$event']) handleKeyUpEvent(
     event: KeyboardEvent
   ) {
