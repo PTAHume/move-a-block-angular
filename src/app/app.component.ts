@@ -6,7 +6,6 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { LevelService } from './services/level.service';
-import Cell from './shared/Cell';
 import ICell from './interfaces/ICell';
 import HandleUpPressAction from './shared/HandleUpPressAction';
 import HandleDownPressAction from './shared/HandleDownPressAction';
@@ -63,7 +62,7 @@ export class AppComponent implements OnInit, OnDestroy {
   GameSetUp = (level: number = 0) => {
     this.currentArrangement = [...Array(100)].map(
       (cell: ICell, index: number) => {
-        return new Cell({ content: emptySpace, index: index });
+        return { content: emptySpace, index: index };
       }
     );
     this.level = level;
@@ -71,10 +70,10 @@ export class AppComponent implements OnInit, OnDestroy {
       (response: ICell[]) => {
         response.forEach(
           (result: ICell) =>
-            (this.currentArrangement[result.index] = new Cell({
+            (this.currentArrangement[result.index] = {
               content: result.content,
               index: result.index,
-            }))
+            })
         );
       },
       null,

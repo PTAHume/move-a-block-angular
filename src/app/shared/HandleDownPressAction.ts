@@ -1,5 +1,6 @@
 import ICell from '../interfaces/ICell';
 import IHandleDownPressAction from '../interfaces/IHandleDownPressAction';
+
 const emptySpace = '/assets/images/blank.png';
 const player = '/assets/images/player.png';
 const box = '/assets/images/box.png';
