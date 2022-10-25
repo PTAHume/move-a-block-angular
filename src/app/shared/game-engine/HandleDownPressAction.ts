@@ -1,5 +1,5 @@
-import ICell from '../interfaces/ICell';
-import IHandleDownPressAction from '../interfaces/IHandleDownPressAction';
+import ICell from 'src/app/interfaces/ICell';
+import IHandleDownPressAction from 'src/app/interfaces/IHandleDownPressAction';
 
 const emptySpace = '/assets/images/blank.png';
 const player = '/assets/images/player.png';

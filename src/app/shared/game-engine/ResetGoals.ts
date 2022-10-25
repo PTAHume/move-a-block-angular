@@ -1,4 +1,5 @@
-import ICell from '../interfaces/ICell';
+import ICell from 'src/app/interfaces/ICell';
+
 const emptySpace = '/assets/images/blank.png';
 const goal = '/assets//images/goal.png';
 const ResetGoals = (

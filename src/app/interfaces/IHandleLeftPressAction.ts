@@ -1,4 +1,4 @@
-import ICell from '../interfaces/ICell';
+import ICell from './ICell';
 export default interface IHandleLeftPressAction {
   handleLeftAction(
     playerLocation: number,

@@ -6,7 +6,7 @@ import { environment } from 'src/environments/environment';
 import ICell from '../interfaces/ICell';
 
 @Injectable({ providedIn: 'root' })
-export class LevelService {
+export default class LevelService {
   private apiRoot = environment.apiUrl;
   constructor(private http: HttpClient) {}
 

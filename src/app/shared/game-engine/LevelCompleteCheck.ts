@@ -1,5 +1,7 @@
-import ICell from '../interfaces/ICell';
+import ICell from 'src/app/interfaces/ICell';
+
 const box = '/assets/images/box.png';
+
 const LevelCompleteCheck = (
   currentArrangement: Array<ICell>,
   goalLocations: Array<ICell>,
